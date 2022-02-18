@@ -2,7 +2,149 @@
 
 ## 1. 赋值运算符函数
 
+```
+class CMyString
+{
+public:
+    CMyString(char *pData = nullptr);
+    CMyString(const CMyString &str);
+    ~CMyString(void);
+
+    CMyString &operator=(const CMyString &str);
+
+private:
+    char *m_pDate;
+};
+
+CMyString::CMyString(char *pData)
+{
+    if(pData == nullptr)
+    {
+        m_pData = new char[1];
+        m_pData[0] = '\0';
+    }
+    else
+    {
+        int length = strlen(pData);
+        m_pDate = new char[length + 1];
+        strcpy(m_pData, pData);
+    }
+}
+
+CMyString::CMyString(const CMyString &str)
+{
+    int length=strlen(str.m_pData);
+    m_pData = new char[length+1];
+    strcpy(m_pData, str.m_pData);
+}
+
+CMyString::~CMyString()
+{
+    delete[] m_pData;
+}
+
+CMyString &CMyString::operator = (const CMyString &str)
+{
+    if(this==&str)
+    {
+        return *this;
+    }
+    delete []m_pData;
+    m_pData = nullptr;
+
+    m_pData = new char[strlen(str.m_pData) + 1];
+    strcpy(m_pData, str.m_pData);
+
+    return *this;
+}
+```
+
 ## 2. 实现 Singleton 模式
+> hungry man
+```
+class Singleton
+{
+private:
+    Singleton()
+    {
+        cout<<"Singleton"<<endl;
+    }
+    static Singleton *instance;
+
+public:
+    static Singleton *GetSingleton()
+    {
+        return instance;
+    }
+    static void Destroy()
+    {
+        delete instance;
+        instance = nullptr;
+    }
+};
+
+Singleton* Singleton::instance = new Singleton();
+
+int main()
+{
+    Singleton *s1 = Singleton::GetSingleton();
+    Singleton *s2 = Singleton::GetSingleton();
+    Singleton *s3 = Singleton::GetSingleton();
+    cout<<s1<<endl;
+    cout<<s2<<endl;
+    cout<<s3<<endl;
+    return 0;
+}
+```
+> lazy man
+```
+class Singleton
+{
+private:
+    Singleton()
+    {
+        cout<<"Singleton"<<endl;
+    }
+    static Singleton *instance;
+
+public:
+    // p.s. In c++ 11, 
+    // static local variaties' initialization
+    // is implemented on thread safety
+    static Singleton *GetSingleton()
+    {
+        if(instance == nullptr)
+        {
+            instance = new Singleton();
+            cout<<"Create Singleton"<<endl;
+        }
+        else
+        {
+            cout<<"Singleton exists"<<endl;
+        }
+        return instance;
+    }
+
+    static void Destory()
+    {
+        delete instance;
+        instance = nullptr;
+    }
+};
+
+Singleton* Singleton::instance = NULL;
+int main()
+{
+    Singleton *s1 = Singleton::GetSingleton();
+    Singleton *s2 = Singleton::GetSingleton();
+    Singleton *s3 = Singleton::GetSingleton();
+    cout<<s1<<endl;
+    cout<<s2<<endl;
+    cout<<s3<<endl;
+    return 0;
+}
+```
+
 
 ## 3. 数组中重复的数字
 
@@ -119,6 +261,38 @@ public:
 ```
 
 ## 4. 二维数组中的查找
+```
+class Solution {
+public:
+    bool Find(int target, vector<vector<int> > array) {
+        if(array.size() == 0)  return false;
+        int c = array[0].size();
+        int r = array.size();
+        int left = 0, down = r - 1;
+        while(left < c && down >= 0)
+        {
+            int current = array[down][left];
+            if(current==target)
+            {
+                return true;
+            }
+            else if(current<target)
+            {
+                left ++;
+            }
+            else
+            {
+                down --;
+            }
+        }
+        return false;
+    }
+};
+```
+> binary search
+```
+
+```
 
 ## 5. 替换空格
 
