@@ -60,7 +60,9 @@ CMyString &CMyString::operator = (const CMyString &str)
 ```
 
 ## 2. 实现 Singleton 模式
+
 > hungry man
+
 ```
 class Singleton
 {
@@ -96,7 +98,9 @@ int main()
     return 0;
 }
 ```
+
 > lazy man
+
 ```
 class Singleton
 {
@@ -151,10 +155,6 @@ int main()
 ```
 class Solution {
 public:
-    /*
-     * @param numbers int vector 
-     * @return int
-     */
     int duplicate(vector<int>& numbers) {
         int dup = -1;
         if(numbers.size()==0)
@@ -193,10 +193,6 @@ public:
 ```
 class Solution {
 public:
-    /*
-     * @param numbers int整型vector 
-     * @return int整型
-     */
     int duplicate(vector<int>& numbers) {
         int dup = -1;
         if(numbers.size()==0)
@@ -289,19 +285,260 @@ public:
     }
 };
 ```
-> binary search
-```
 
+> binary search
+
+```
+class Solution {
+public:
+    bool double_binary(vector<vector<int>> arr,int x1,int x2,int y1, int y2,int target){
+        if(x1 == x2 || y1 == y2) return false;
+        int xmid = (x1+x2)/2, ymid = (y1+y2)/2;
+        int num = arr[xmid][ymid];
+        if(num == target) return true;
+        if(num > target)
+        {
+           if(double_binary(arr, x1, xmid, y1, y2, target)) return true;
+           if(double_binary(arr,xmid,x2,y1,ymid,target)) return true;
+        }
+        else
+        {
+            if(double_binary(arr, xmid+1, x2, y1, y2, target)) return true;
+            if(double_binary(arr, x1, xmid+1, ymid+1, y2, target)) return true;
+        }
+        return false;
+    }
+    bool Find(int target, vector<vector<int> > array) {
+        if(array.size() == 0) return false;
+        return double_binary(array, 0, array.size(), 0, array[0].size(), target);
+    }
+};
 ```
 
 ## 5. 替换空格
+```
+class Solution {
+public:
+    string replaceSpace(string s) {
+        if(s.size()==0)
+        {
+            return s;
+        }
+        
+        int count = 0;
+        for(int i=0;i<s.size();i++)
+        {
+            if(s[i]==' ')
+            {
+                count ++;
+            }
+        }
+        
+        int index_old = s.size() - 1;
+        int index_new = s.size() + count*2 - 1;
+        s.resize(s.size()+count*2);
+        
+        while(index_old != -1)
+        {
+            if(s[index_old]==' ')
+            {
+                s[index_new--]='0';
+                s[index_new--]='2';
+                s[index_new--]='%';
+                index_old--;
+            }
+            else
+            {
+                s[index_new--] = s[index_old--];
+            }
+        }
+        return s;
+    }
+};
+```
+
+> 相关题目：两个有序数组 A1 和 A2，内存中 A1 末尾有足够空间容纳 A2。请实现一个函数，把 A2 中所有数字插入 A1 中，并且保持有序。
+
+```
+class Solution
+{
+public:
+    // p.s. Suppose the data is arranged in ascending order
+    void array_insert(vector<int> &arr1, vector<int> arr2)
+    {
+        int len1 = arr1.size();
+        int len2 = arr2.size();
+        if(len1 == 0 || len2 == 0)
+        {
+            return;
+        }
+        
+        arr1.resize(arr1.size()+arr2.size());
+        int index1 = len1 - 1;
+        int index2 = len2 - 1;
+
+        for(int i = arr1.size() - 1; i >=0; i--)
+        {
+            if(arr1[index1] > arr2[index2])
+            {
+                arr1[i] = arr1[index1--];
+            }
+            else
+            {
+                arr1[i] = arr2[index2--];
+            }
+        }
+        return;
+    }
+};
+```
 
 ## 6. 从尾部到头打印链表
+```
+/**
+*  struct ListNode {
+*        int val;
+*        struct ListNode *next;
+*        ListNode(int x) :
+*              val(x), next(NULL) {
+*        }
+*  };
+*/
+class Solution {
+public:
+    vector<int> printListFromTailToHead(ListNode* head) {
+        ListNode *pNode = head;
+        stack<ListNode *> nodes;
+        vector<int> res;
+        
+        if(head == nullptr)
+        {
+            return res;
+        }
+        
+        while(pNode != nullptr)
+        {
+            nodes.push(pNode);
+            pNode = pNode->next;
+        }
+        
+        while(!nodes.empty())
+        {
+            pNode = nodes.top();
+            nodes.pop();
+            res.push_back(pNode->val);
+        }
+        return res;
+    }
+};
+```
 
 ## 7. 重建二叉树
+```
+class Solution {
+private:
+    TreeNode *root;
+    vector<int> i, p;
+public:
+    TreeNode* build(int lp, int rp, int lv, int rv)
+    {
+        if(lp > rp)
+        {
+            return nullptr;
+        }
+        TreeNode *now = new TreeNode(p[lp]);
+        int index = lv;
+        while(index <= rv && p[lp] != i[index])
+        {
+            index ++;
+        }
+        int len = index - lv;
+        now->left = build(lp+1, lp+len, lv, index - 1);
+        now->right = build(lp + len + 1, rp, index + 1, rv);
+        return now;
+    }
+    
+    TreeNode* reConstructBinaryTree(vector<int> pre,vector<int> vin) {
+        p = pre, i = vin;
+        TreeNode *root = build(0, pre.size()-1, 0, vin.size()-1);
+        return root;
+    }
+};
+```
 
 ## 8. 二叉树的下一个节点
+```
+/*
+struct TreeLinkNode {
+    int val;
+    struct TreeLinkNode *left;
+    struct TreeLinkNode *right;
+    struct TreeLinkNode *next;
+    TreeLinkNode(int x) :val(x), left(NULL), right(NULL), next(NULL) {
+        
+    }
+};
+*/
+class Solution {
+public:
+    TreeLinkNode* GetNext(TreeLinkNode* pNode) {
+        if(!pNode)
+        {
+            return nullptr;
+        }
+        if(pNode->right)
+        {
+            TreeLinkNode* rightChild = pNode->right;
+            while(rightChild->left)
+            {
+                rightChild = rightChild->left;
+            }
+            return rightChild;
+        }
+        while(pNode->next)
+        {
+            if(pNode->next->left == pNode)
+            {
+                return pNode->next;    
+            }
+            pNode = pNode->next;
+        }
+        return nullptr;
+    }
+};
+```
 
 ## 9. 用两个栈实现队列
+```
+class Solution
+{
+public:
+    void push(int node) {
+        stack1.push(node);
+    }
+
+    int pop() {
+        int cur, tmp;
+        while(!stack1.empty())
+        {
+            cur = stack1.top();
+            stack1.pop();
+            stack2.push(cur);
+        }
+        stack2.pop();
+        while(!stack2.empty())
+        {
+            tmp = stack2.top();
+            stack2.pop();
+            stack1.push(tmp);
+        }
+        return cur;
+    }
+
+private:
+    stack<int> stack1;
+    stack<int> stack2;
+};
+```
 
 
