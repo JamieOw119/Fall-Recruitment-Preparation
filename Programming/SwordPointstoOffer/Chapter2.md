@@ -541,4 +541,126 @@ private:
 };
 ```
 
+## 10. 斐波那契数列
+> recurrence
+
+```
+class Solution {
+public:
+    int Fibonacci(int n) 
+    {
+        int a = 0, b = 1;
+        while(--n)
+        {
+            int c = a;
+            a = b;
+            b = c + b;
+        }
+        return b;
+    }
+};
+```
+
+> recursion
+
+```
+class Solution {
+public:
+    int recursion(int n)
+    {
+        if(n==0)
+        {
+            return 0;
+        }
+        if(n==1)
+        {
+            return 1;
+        }
+        return recursion(n-1) + recursion(n-2);
+    }
+    
+    int Fibonacci(int n) 
+    {
+        return recursion(n);
+    }
+};
+```
+
+> magic: O(logn)
+
+```
+struct Matrix2x2
+{
+    int m_00;
+    int m_01;
+    int m_10;
+    int m_11;
+    Matrix2x2
+    (
+        int m00 = 0,
+        int m01 = 0,
+        int m10 = 0,
+        int m11 = 0
+    ):m_00(m00),m_01(m01),m_10(m10),m_11(m11){}
+};
+
+Matrix2x2 MatrixMultiply(const Matrix2x2 &mat1, const Matrix2x2 &mat2)
+{
+    return Matrix2x2
+    (
+        mat1.m_00 * mat2.m_00 + mat1.m_01 * mat2.m_10,
+        mat1.m_00 * mat2.m_01 + mat1.m_01 * mat2.m_11,
+        mat1.m_10 * mat2.m_00 + mat1.m_11 * mat2.m_10,
+        mat1.m_10 * mat2.m_01 + mat1.m_11 * mat2.m_11
+    );
+}
+
+Matrix2x2 MatrixPower(int n)
+{
+    // a little bit inappropriate ...
+    if(n == 0) return Matrix2x2(0, 0, 0, 0);
+    
+    Matrix2x2 mat;
+    if(n==1)
+    {
+        mat = Matrix2x2(1,1,1,0);
+    }
+    else if(n % 2 == 0)
+    {
+        mat = MatrixPower(n / 2);
+        mat = MatrixMultiply(mat, mat);
+    }
+    else if(n % 2 == 1)
+    {
+        mat = MatrixPower((n-1)/2);
+        mat = MatrixMultiply(mat, mat);
+        mat = MatrixMultiply(mat, Matrix2x2(1,1,1,0));
+    }
+    return mat;
+}
+
+class Solution {
+public:
+    int Fibonacci(int n) 
+    {
+        if(n==0) return 0;
+        if(n==1) return 1;
+        Matrix2x2 mat = MatrixPower(n-1);
+        return mat.m_00;
+    }
+};
+```
+
+> 相关题目 1：青蛙跳台阶问题
+> - 实质是斐波那契问题
+> - 进阶版数学归纳法证明 [证明过程的地址](https://blog.csdn.net/weixin_43160744/article/details/120472548)
+> 
+> 相关题目 2：矩形覆盖问题
+> - f(8) = 2*f(6) + f(7)
+> - f(2) = 3
+> - f(1) = 1
+
+
+
+
 
