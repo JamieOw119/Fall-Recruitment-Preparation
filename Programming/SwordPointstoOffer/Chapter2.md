@@ -660,6 +660,267 @@ public:
 > - f(2) = 3
 > - f(1) = 1
 
+## 11. 旋转数组的最小数字
+```
+class Solution {
+public:
+    int minNumberInRotateArray(vector<int> rotateArray) {
+        if(rotateArray.size()==0)
+            return 0;
+        int index1 = 0, index2 = rotateArray.size() - 1;
+        int indexMid = index1;
+        
+        while(rotateArray[index1]>=rotateArray[index2])
+        {
+            // index2 已经指向最小数字
+            if(index2-index1==1)
+            {
+                indexMid = index2;
+                break;
+            }
+            
+            int indexMid = (index1 + index2) / 2;
+            
+            // original array: 0 1 1 1 1
+            // changed array 1: 1 0 1 1 1
+            // changed array 2: 1 1 1 0 1
+            if(rotateArray[index1]==rotateArray[index2]
+               &&rotateArray[index1]==rotateArray[indexMid])
+            {
+                int result = rotateArray[index1];
+                for(int i=index1+1; i<=index2; i++)
+                {
+                    if(result>rotateArray[i])
+                    {
+                        result = rotateArray[i];
+                    }
+                }
+                return result;
+            }
+            
+            // 落在前半段，向两段交界靠拢
+            if(rotateArray[indexMid]>=rotateArray[index1])
+            {
+                index1 = indexMid;
+            }
+            // 落在后半段，向两段交界靠拢
+            else if(rotateArray[indexMid]<=rotateArray[index2])
+            {
+                index2 = indexMid;
+            }
+        }
+        
+        return rotateArray[indexMid];
+    }
+};
+```
+
+## 12. 矩阵中的路径
+```
+class Solution {
+public:
+    int dx[4][2] = {{0, -1}, {0, 1}, {1, 0}, {-1, 0}};
+    
+    bool hasPathCore(vector<vector<char> >& matrix, string &word, int row, int col, int pathLength)
+    {
+        if(word[pathLength] != matrix[row][col])
+        {
+            return false;
+        }
+        
+        char temp  = matrix[row][col];
+        matrix[row][col] = '*';
+        pathLength ++;
+        if(word.size() == pathLength)
+        {
+            return true;
+        }
+        
+        bool hasPath;
+        for(int i=0; i<4; i++)
+        {
+            row += dx[i][0];
+            col += dx[i][1];
+            if (row >= 0 && row < matrix.size() && col >= 0 && col < matrix[0].size())
+            {
+                if (hasPathCore(matrix, word, row, col, pathLength)){
+                    return true;
+                }            
+            }
+            row -= dx[i][0];
+            col -= dx[i][1];
+        }
+        
+        matrix[row][col]=temp;
+        return false;
+    }
+    
+    bool hasPath(vector<vector<char> >& matrix, string word) {
+        if(matrix.size()==0 || matrix[0].size()==0 || word.size()==0)
+        {
+            return false;
+        }
+        
+        int pathLength = 0;
+        
+        for(int r=0; r<matrix.size(); r++)
+        {
+            for(int c=0; c<matrix[0].size(); c++)
+            {
+                if(hasPathCore(matrix, word, r, c, pathLength))
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+};
+```
+
+## 13. 机器人的运动范围
+```
+class Solution {
+public:
+    int movingCount(int threshold, int rows, int cols) {
+        if(threshold<0||rows<=0||cols<=0)
+        {
+            return 0;
+        }
+        vector<vector<bool>> map(rows, vector<bool>(cols));
+        int count = dfs(threshold, 0, 0, map);
+        map.clear();
+        return count;
+    }
+    
+    int getDigitSum(int num)
+    {
+        int sum=0;
+        while(num)
+        {
+            sum += num % 10;
+            num /= 10;
+        }
+        return sum;
+    }
+    
+    int check(int threshold, int row, int col, const vector<vector<bool>> &map)
+    {
+        if(row >= 0 && row < map.size() && col >= 0 && col < map[0].size() 
+           && !map[row][col] && getDigitSum(row) + getDigitSum(col) <= threshold)
+        {
+            return true;
+        }
+        return false;
+    }
+    
+    int dfs(int threshold, int row, int col, vector<vector<bool>> &map)
+    {
+        int count = 0;
+        if(check(threshold, row, col, map))
+        {
+            map[row][col] = true;
+            count = 1 + dfs(threshold, row + 1, col, map) 
+            + dfs(threshold, row - 1, col, map) 
+            + dfs(threshold, row, col + 1, map) 
+            + dfs(threshold, row, col - 1, map); 
+        }
+        
+        return count;
+    }
+};
+```
+
+## 14.剪绳子
+
+> 动态规划
+
+```
+class Solution {
+public:
+    int cutRope(int number) {
+        if(number<2) return 0;
+        if(number==2) return 1;
+        if(number==3) return 2;
+        
+        int *product=new int[number+1];
+        product[0] = 0;
+        product[1] = 1;
+        product[2] = 2;
+        product[3] = 3;
+        
+        int max = 0;
+        for(int i=4; i<=number; i++)
+        {
+            max = 0; 
+            for(int j=1; j<=i/2; j++)
+            {
+                int prdt = product[j] * product[i - j];
+                if(max < prdt) max = prdt;
+                product[i] = max;
+            }
+            
+        }
+        
+        max = product[number];
+        delete product;
+        return max;
+    }
+};
+```
+
+> 贪心算法
+
+```
+class Solution {
+public:
+    int cutRope(int number) {
+        if(number<2) return 0;
+        if(number==2) return 1;
+        if(number==3) return 2;
+        
+        int *product=new int[number+1];
+        product[0] = 0;
+        product[1] = 1;
+        product[2] = 2;
+        product[3] = 3;
+        
+        int max = 0;
+        int timesOf3 = number/3;
+        if(number-timesOf3*3==1)
+        {
+            timesOf3-=1;
+            max=(int)(pow(3,timesOf3))*4;
+        }
+        else if(number-timesOf3*3==2)
+            max=(int)(pow(3,timesOf3))*2;
+        else max=(int)(pow(3,timesOf3));
+        return max;
+    }
+};
+```
+
+## 15. 二进制中 1 的个数
+```
+class Solution {
+public:
+     int  NumberOf1(int n) {
+         int count=0;
+         while(n)
+         {
+             count++;
+             // 把该整数最右边的 1 变成 0
+             n = (n-1)&n;
+         }
+         return count;
+     }
+};
+```
+
+> 相关题目 1：判断一个整数是不是 2 的整数次方，如果是的话这个数只有 1 位是 1，其他都是 0。(n-1) & n = 0
+> 相关题目 2：输入两个整数 m 和 n， 需要改变 m 的二进制数多少位才能得到 n。
+> - Step 1：k = m ^ n
+> - Step 2：NumberOf1(k)
 
 
 
