@@ -190,9 +190,105 @@ public:
 > 
 > Solution 2：重建链表，时间复杂度 O(n^2）空间复杂度 o(n)
 
-## TODO：4. 正则表达式匹配
+## 4. 正则表达式匹配
 
-## TODO：5. 表示数值的字符串
+```
+class Solution {
+public:
+    bool match(string str, string pattern) 
+    {
+        if(pattern.empty() || str.empty())
+        {
+            return false;
+        }
+        
+        char *str_char = new char[str.size() + 1];
+        char *pattern_char = new char[pattern.size()];
+        strcpy(str_char, str.data());
+        strcpy(pattern_char, pattern.data());
+        str_char[str.size()] = '\0';
+        pattern_char[pattern.size()] = '\0';
+        
+        return matchCore(str_char, pattern_char);
+    }
+    
+    bool matchCore(char *str, char *pattern)
+    {
+        if(*str == '\0' && *pattern == '\0')
+        {
+            return true;
+        }
+        if(*str != '\0' && *pattern == '\0')
+        {
+            return false;
+        }
+        if(*(pattern+1) == '*')
+        {
+            if(*pattern == *str || (*pattern == '.' && *str != '\0'))
+            {
+                return matchCore(str+1, pattern+2) || matchCore(str+1, pattern) || matchCore(str, pattern+2);
+            }
+            else
+            {
+                return matchCore(str, pattern+2);
+            }
+            
+        }
+        if(*str==*pattern||(*pattern=='.' && *str != '\0'))
+        {
+            return matchCore(str+1, pattern+1);
+        }
+        
+        return false;
+    }
+};
+```
+
+## 5. 表示数值的字符串
+
+```
+class Solution {
+public:
+    int i = 0; 
+   
+    bool scanIntger(string str){
+        if(str[i]=='+' || str[i]=='-'){
+            i++;
+        }
+        return scanfUnsignIntger(str);
+    }
+   
+    bool scanfUnsignIntger(string str){
+        int k = i;
+        while('0'<=str[i] && str[i]<='9'){
+            i++;
+        }
+        return i>k;
+    }
+     
+    bool isNumeric(string str) {
+        while(str[i]==' ') i++;
+        bool ans = scanIntger(str);
+ 
+        if(i<str.size() && str[i]=='.'){
+            i++;
+            ans = scanfUnsignIntger(str) || ans;
+        }
+         
+        if(i<str.size() && (str[i]=='E'|| str[i]=='e')){
+            i++;
+            ans = scanIntger(str) && ans;
+        }
+        while(str[i]==' ') i++;
+         
+        if(ans==true && i==str.size()){
+            return true;
+        }else{
+            return false;
+        }
+    }
+};
+```
 
 ## 6. 调整数组顺序使奇数位于偶数前面
 
@@ -220,4 +316,32 @@ public:
 };
 ```
 
-> TODO：双指针法
+> 不使用额外空间
+
+```
+class Solution {
+public:
+    vector<int> reOrderArray(vector<int>& array) {
+        int firstEven = 0;
+        for(int i=0; i<array.size(); i++)
+        {
+            if(array.at(i) & 0x01 && i == firstEven)
+            {
+                firstEven++;
+            }
+            else if(array.at(i) & 0x01){
+                int temp = array.at(i);
+                int pre = array.at(firstEven);
+                for(int j = firstEven + 1;j < i + 1;j++){
+                    int tmp = array.at(j);
+                    array.at(j) = pre;
+                    pre = tmp;
+                }
+                array.at(firstEven) = temp;
+                firstEven++;
+            }
+        }
+        return array;
+    }
+};
+```
