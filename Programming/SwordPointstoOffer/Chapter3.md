@@ -345,3 +345,244 @@ public:
     }
 };
 ```
+
+## 7. 打印链表的倒数第 k 个节点
+
+```
+class Solution {
+public:
+    ListNode* FindKthToTail(ListNode* pHead, int k) {
+        // write code here
+        if(pHead == nullptr)
+        {
+            return nullptr;
+        }
+        ListNode *fast = pHead;
+        ListNode *slow = pHead;
+        while(k-- != 1)
+        {
+            if(!fast->next)
+            {
+                return nullptr;
+            }
+            fast = fast->next;
+        }
+        while(fast->next)
+        {
+            fast = fast->next;
+            slow = slow->next;
+        }
+        return slow;
+    }
+};
+```
+
+## 8. 链表中环的入口节点
+
+```
+/*
+struct ListNode {
+    int val;
+    struct ListNode *next;
+    ListNode(int x) :
+        val(x), next(NULL) {
+    }
+};
+*/
+class Solution {
+public:
+    ListNode* EntryNodeOfLoop(ListNode* pHead)
+    {
+        ListNode* meetingNode = MeetingNode(pHead);
+        if(meetingNode == nullptr)
+            return nullptr;
+
+        int nodesInLoop = 1;
+        ListNode* pNode1 = meetingNode;
+        while(pNode1->next != meetingNode)
+        {
+            pNode1 = pNode1->next;
+            ++nodesInLoop;
+        }
+
+        pNode1 = pHead;
+        for(int i = 0; i < nodesInLoop; ++i)
+            pNode1 = pNode1->next;
+
+        ListNode* pNode2 = pHead;
+        while(pNode1 != pNode2)
+        {
+            pNode1 = pNode1->next;
+            pNode2 = pNode2->next;
+        }
+
+        return pNode1;
+    }
+    
+    ListNode* MeetingNode(ListNode* pHead)
+    {
+        if(pHead == nullptr)
+            return nullptr;
+
+        ListNode* pSlow = pHead->next;
+        if(pSlow == nullptr)
+            return nullptr;
+
+        ListNode* pFast = pSlow->next;
+        while(pFast != nullptr && pSlow != nullptr)
+        {
+            if(pFast == pSlow)
+                return pFast;
+
+            pSlow = pSlow->next;
+
+            pFast = pFast->next;
+            if(pFast != nullptr)
+                pFast = pFast->next;
+        }
+
+        return nullptr;
+    }
+};
+```
+
+## 9. 反转链表
+
+```
+class Solution {
+public:
+    ListNode* ReverseList(ListNode* pHead) {
+        if(pHead == nullptr)
+        {
+            return nullptr;
+        }
+        
+        ListNode *cur = pHead;
+        ListNode *nxt = nullptr;
+        ListNode *pre = nullptr;
+        ListNode *newHead = nullptr;
+        
+        while(cur)
+        {
+            nxt = cur->next;
+            if(nxt == nullptr)
+            {
+                newHead = cur;
+            }
+            cur->next = pre;
+            pre = cur;
+            cur = nxt;
+        }
+        return newHead;
+    }
+};
+```
+
+> 递归实现反转链表
+
+```
+class Solution {
+public:
+    ListNode *ReverseList(ListNode *pHead)
+    {
+        if(pHead == nullptr || pHead->next == nullptr)
+        {
+            return pHead;
+        }
+        
+        ListNode *ans = ReverseList(pHead->next);
+        pHead->next->next = pHead;
+        pHead->next = nullptr;
+        return ans;
+    }
+};
+```
+
+## 10. 合并两个有序链表
+
+```
+/*
+struct ListNode {
+	int val;
+	struct ListNode *next;
+	ListNode(int x) :
+			val(x), next(NULL) {
+	}
+};*/
+class Solution {
+public:
+    ListNode* Merge(ListNode* pHead1, ListNode* pHead2) {
+        if(!pHead1)
+        {
+            return pHead2;
+        }
+        if(!pHead2)
+        {
+            return pHead1;
+        }
+        
+        ListNode *pMergeHead = nullptr;
+        
+        if(pHead1->val < pHead2->val)
+        {
+            pMergeHead = pHead1;
+            pMergeHead->next = Merge(pHead1->next, pHead2);
+        }
+        else
+        {
+            pMergeHead = pHead2;
+            pMergeHead->next = Merge(pHead1, pHead2->next);
+        }
+        return pMergeHead;
+    }
+};
+```
+
+## 11. 树的子结构
+
+```
+/*
+struct TreeNode {
+	int val;
+	struct TreeNode *left;
+	struct TreeNode *right;
+	TreeNode(int x) :
+			val(x), left(NULL), right(NULL) {
+	}
+};*/
+class Solution {
+public:
+    bool HasSubtree(TreeNode* pRoot1, TreeNode* pRoot2) {
+        bool result = false;
+        if(pRoot1 && pRoot2)
+        {
+            if(pRoot1->val == pRoot2->val)
+                result = DoesTree1HaveTree2(pRoot1, pRoot2);
+            if(!result)
+                result = HasSubtree(pRoot1->left, pRoot2);
+            if(!result)
+                result = HasSubtree(pRoot1->right, pRoot2);
+        }
+        return result;
+    }
+    
+    bool DoesTree1HaveTree2(TreeNode *tree1, TreeNode *tree2)
+    {
+        if(tree2 == nullptr)
+        {
+            return true;
+        }
+        if(tree1 == nullptr)
+        {
+            return false;
+        }
+        if(tree1->val != tree2->val)
+        {
+            return false;
+        }
+        bool leftResult = DoesTree1HaveTree2(tree1->left, tree2->left);
+        bool rightResult = DoesTree1HaveTree2(tree1->right, tree2->right);
+        return leftResult && rightResult;
+    }
+};
+```
