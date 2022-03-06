@@ -547,16 +547,18 @@ private:
 ```
 class Solution {
 public:
-    int Fibonacci(int n) 
-    {
-        int a = 0, b = 1;
-        while(--n)
-        {
-            int c = a;
-            a = b;
-            b = c + b;
+    int Fibonacci(int n) {
+        int MOD = 1000000007;
+        if (n < 2) {
+            return n;
         }
-        return b;
+        int p = 0, q = 0, r = 1;
+        for (int i = 2; i <= n; ++i) {
+            p = q; 
+            q = r; 
+            r = (p + q)%MOD;
+        }
+        return r;
     }
 };
 ```
@@ -655,6 +657,25 @@ public:
 > - 实质是斐波那契问题
 > - 进阶版数学归纳法证明 [证明过程的地址](https://blog.csdn.net/weixin_43160744/article/details/120472548)
 > - 还有常数计算复杂度的解法（不强求）
+
+```
+class Solution {
+public:
+     int numWays(int n) {
+        int i0 = 1,i1 = 1,i2 = 2, sum = 0;
+        if(n < 2){
+            return 1;
+        }
+        for(int i = 2;i <= n;i++){
+            sum = (i0 + i1) % 1000000007;
+            i0 = i1;
+            i1 = sum;
+        }
+        return sum;
+    }
+};
+```
+
 > 
 > 相关题目 2：矩形覆盖问题
 > - f(8) = 2*f(6) + f(7)
@@ -875,28 +896,19 @@ public:
 ```
 class Solution {
 public:
-    int cutRope(int number) {
-        if(number<2) return 0;
-        if(number==2) return 1;
-        if(number==3) return 2;
-        
-        int *product=new int[number+1];
-        product[0] = 0;
-        product[1] = 1;
-        product[2] = 2;
-        product[3] = 3;
-        
-        int max = 0;
-        int timesOf3 = number/3;
-        if(number-timesOf3*3==1)
-        {
-            timesOf3-=1;
-            max=(int)(pow(3,timesOf3))*4;
-        }
-        else if(number-timesOf3*3==2)
-            max=(int)(pow(3,timesOf3))*2;
-        else max=(int)(pow(3,timesOf3));
-        return max;
+    int cutRope(int n) {
+        if(n <= 3) 
+            return n - 1;
+        int b = n % 3, p = 1000000007;
+        long ret = 1;
+        int lineNums=n/3;           
+        for(int i=1;i<lineNums;i++) 
+            ret = 3*ret % p;
+        if(b == 0) 
+            return (int)(ret * 3 % p);   
+        if(b == 1) 
+            return (int)(ret * 4 % p);   
+        return (int)(ret * 6 % p);     // b == 2 
     }
 };
 ```
