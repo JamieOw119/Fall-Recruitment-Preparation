@@ -651,6 +651,344 @@ public:
 
 ## 11. 序列化二叉树
 
-```
+> 先序遍历
 
 ```
+/*
+struct TreeNode {
+    int val;
+    struct TreeNode *left;
+    struct TreeNode *right;
+    TreeNode(int x) :
+            val(x), left(NULL), right(NULL) {
+    }
+};
+*/
+class Solution {
+public:
+    const char SEP = '&';
+    const char NULL_NODE = '#';
+    char* Serialize(TreeNode *root) {    
+        if(!root){
+            return nullptr;
+        }
+        stack<TreeNode*> nodes;
+        TreeNode* cur = root;
+        string s;
+        
+        while(cur || !nodes.empty()){
+            while(cur){
+                s.append(to_string(cur->val));
+                s.push_back(SEP);
+                nodes.push(cur);
+                cur = cur->left;
+            }
+            s.push_back(NULL_NODE);
+            s.push_back(SEP);
+            cur = nodes.top();
+            nodes.pop();
+            cur = cur->right;
+        }
+        s.push_back(NULL_NODE);
+        s.push_back(SEP);
+        char* ret = new char[s.length() + 1];
+        strcpy(ret, s.c_str());
+        return ret;
+        
+    }
+    
+    TreeNode* Deserialize(char *str) {
+        if(!str){
+            return nullptr;
+        }
+        string s(str);
+        TreeNode* root = new TreeNode(atoi(s.c_str()));
+        s = s.substr(s.find_first_of(SEP) + 1);
+        TreeNode* cur = root;
+        stack<TreeNode*> nodes;
+        while(!s.empty() && (cur || !nodes.empty())){
+            while(cur){
+                nodes.push(cur);
+                if(s[0] == NULL_NODE){
+                    cur->left = nullptr;
+                }else{
+                    cur->left = new TreeNode(atoi(s.c_str()));
+                }
+                s = s.substr(s.find_first_of(SEP)+1);
+                cur = cur->left;
+            }
+            cur = nodes.top();
+            nodes.pop();
+            if(s[0] == NULL_NODE){
+                cur->right = nullptr;
+            }else{
+                cur->right = new TreeNode(atoi(s.c_str()));
+            }
+            s = s.substr(s.find_first_of(SEP)+1);
+            cur = cur->right;
+        }
+        return root;
+    }
+};
+```
+
+> 层次遍历
+
+```
+/*
+struct TreeNode {
+    int val;
+    struct TreeNode *left;
+    struct TreeNode *right;
+    TreeNode(int x) :
+            val(x), left(NULL), right(NULL) {
+    }
+};
+*/
+class Solution {
+public:
+    const char SEP = '&';
+    const char NULL_NODE = '#';
+    
+    char* Serialize(TreeNode *root) {    
+        if(!root)
+        {
+            return nullptr;
+        }
+        queue<TreeNode *> nodes;
+        nodes.push(root);
+        string serialized_str;
+        while(!nodes.empty())
+        {
+            TreeNode *head = nodes.front();
+            nodes.pop();
+            if(head)
+            {
+                serialized_str.append(to_string(head->val));
+                nodes.push(head->left);
+                nodes.push(head->right);
+            }
+            else
+            {
+                serialized_str.push_back(NULL_NODE);
+            }
+            serialized_str.push_back(SEP);
+        }
+        char* ret = new char[serialized_str.length() + 1];
+        strcpy(ret, serialized_str.c_str());
+        return ret;
+    }
+    
+    TreeNode* Deserialize(char *str) {
+        if(!str)
+        {
+            return nullptr;
+        }
+        string s(str);
+        if(s[0] == NULL_NODE)
+        {
+            return nullptr;
+        }
+        queue<TreeNode*> nodes;
+        TreeNode* root = new TreeNode(atoi(s.c_str()));
+        nodes.push(root);
+        s = s.substr(s.find_first_of(SEP)+1); 
+        
+        while(!nodes.empty() && !s.empty()){
+            TreeNode* head = nodes.front();
+            nodes.pop();
+            if(s[0] == NULL_NODE){
+                head->left == nullptr;
+            }else{
+                head->left = new TreeNode(atoi(s.c_str()));
+                nodes.push(head->left);
+            }
+            s = s.substr(s.find_first_of(SEP) + 1);
+             
+            if(s[0] == NULL_NODE){
+                head->right = nullptr;
+            }else{
+                head->right = new TreeNode(atoi(s.c_str()));
+                nodes.push(head->right);
+            }
+            s = s.substr(s.find_first_of(SEP) + 1);
+        }
+        return root;
+    }
+};
+```
+
+## 12. 字符串的排列
+
+> 基于 demo 的方法
+
+```
+class Solution {
+public:
+    vector<string> res;
+    vector<string> Permutation(string str) 
+    {
+        if(str.empty())
+        {
+            return res;
+        }
+        vector<bool> state(str.size(), false);
+        backtracking(str, "", state);
+        return res;
+    }
+    
+    void backtracking(string s, string cur, vector<bool> &state)
+    {
+        if(cur.size() == s.size())
+        {
+            res.push_back(cur);
+            return;
+        }
+        for(int i=0; i < s.size(); i ++)
+        {
+            if(state[i] || (i > 0 && s[i] == s[i-1] && state[i - 1]))
+            {
+                continue;
+            }
+            state[i] = true;
+            cur += s[i];
+            backtracking(s, cur, state);
+            state[i] = false;
+            cur = cur.substr(0, cur.length()-1);
+        }
+    }
+};
+```
+
+> 基于 swap 的方法
+
+```
+class Solution
+{
+    vector<vector<int> > result;
+
+    void PermutationCore(vector<int> numbers, int position = 0, int len = 8)
+    {
+        if(position == len - 1 && checking(numbers))
+        {
+            result.push_back(numbers);
+        }
+        
+        for(int i=position; i<len; i++)
+        {
+            swap(numbers[position], numbers[i]);
+            PermutationCore(numbers, position + 1);
+            swap(numbers[position], numbers[i]);
+        }
+    }
+
+    vector<vector<int> > PermutationCore(vector<int> numbers)
+    {
+        if(numbers.empty())
+        {
+            return result;
+        }
+        return PermutationCore(numbers, 0, numbers.size());
+    }
+};
+
+```
+
+> 相关题目1: 字符串的组合
+
+```
+class Solution
+{
+    vector<vector<char> > Combine(string s)
+    {
+        vector<vector<char> > result;
+        if(s.size() == 0)
+        {
+            return res;
+        }
+
+        for(int index=0; index<(1<<s.size()); index++)
+        {
+            vector<char> res;
+            for(int i=0; i<s.size(); i++)
+            {
+                if(index & (1 << i))
+                {
+                    res.push_back(s[i]);
+                }
+            }
+            if(!res.empty())
+            {
+                result.push_back(res);
+            }
+        }
+        return result;
+    }
+};
+```
+
+> 相关题目2：正方体 8 个顶点上放 8 个数字，使得正方体上三组相对的面上的 4 个顶点的和相等
+
+```
+class Solution
+{
+    bool checking(vector<int> data)
+    {
+        bool ok = false;
+        if (data[0] + data[1] + data[2] + data[3] == data[4] + data[5] + data[6] + data[7] &&
+            data[0] + data[2] + data[4] + data[6] == data[1] + data[3] + data[5] + data[7] &&
+            data[0] + data[1] + data[4] + data[5] == data[2] + data[3] + data[6] + data[7])
+            ok = true;
+        return ok;
+    }
+
+    // 以下参照全排列的方法，将 8 个顶点的数字的每个全排列都交给 checking 函数判断，符合条件的可以放入返回集合中。
+};
+```
+
+> 相关题目3：N 皇后问题
+
+```
+class Solution {
+public:
+    vector<vector<string>> solveNQueens(int n) {
+        auto solutions = vector<vector<string>>();
+        auto queens = vector<int>(n, -1);
+        solve(solutions, queens, n, 0, 0, 0, 0);
+        return solutions;
+    }
+
+    void solve(vector<vector<string>> &solutions, vector<int> &queens, int n, int row, int columns, int diagonals1, int diagonals2) {
+        if (row == n) {
+            auto board = generateBoard(queens, n);
+            solutions.push_back(board);
+        } else {
+            int availablePositions = ((1 << n) - 1) & (~(columns | diagonals1 | diagonals2));
+            while (availablePositions != 0) {
+                int position = availablePositions & (-availablePositions);
+                availablePositions = availablePositions & (availablePositions - 1);
+                int column = __builtin_ctz(position);
+                queens[row] = column;
+                solve(solutions, queens, n, row + 1, columns | position, (diagonals1 | position) >> 1, (diagonals2 | position) << 1);
+                queens[row] = -1;
+            }
+        }
+    }
+
+    vector<string> generateBoard(vector<int> &queens, int n) {
+        auto board = vector<string>();
+        for (int i = 0; i < n; i++) {
+            string row = string(n, '.');
+            row[queens[i]] = 'Q';
+            board.push_back(row);
+        }
+        return board;
+    }
+};
+```
+
+> p.s.1 x & (−x) 可以获得 x 的二进制表示中的最低位的 1 的位置
+
+> p.s.2 x & (x−1) 可以将 x 的二进制表示中的最低位的 1 置成 0
+
+> p.s.3 __builtin_ctz x末尾0的个数。x=0时结果未定义
