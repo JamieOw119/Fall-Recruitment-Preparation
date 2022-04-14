@@ -340,3 +340,290 @@ public:
     }
 };
 ```
+
+## 6. 数字序列中某一位的数字
+
+```
+class Solution {
+public:
+    int findNthDigit(int n) {
+        // write code here
+        int digit = 1;
+        long long start = 1;
+        long long cnt = 9;
+        while(n>cnt)
+        {
+            n-=cnt;
+            digit ++;
+            start *= 10;
+            cnt = 9 * start * digit;
+        }
+        n --;
+        int num = start + n / digit;
+        int ans = to_string(num)[n % digit] - '0';
+        return ans;
+    }
+};
+```
+
+## 7. 把数组排成最小的数
+
+```
+bool cmp(const string &a, const string &b)
+{
+    string s1 = a + b;
+    string s2 = b + a;
+    return s1 < s2;
+}
+
+class Solution {
+public:
+    string PrintMinNumber(vector<int> numbers) 
+    {
+        vector<string> sort_nums;
+        for(auto &i: numbers)
+        {
+            sort_nums.push_back(to_string(i));
+        }
+        sort(sort_nums.begin(), sort_nums.end(), cmp);
+        string result = "";
+        for(const auto s: sort_nums)
+        {
+            result += s;
+        }
+        return result;
+    }
+};
+```
+
+## 8. 把数字翻译成字符串
+
+```
+class Solution {
+public:
+    int solve(string nums) {
+        vector<int> res(nums.size()+1,0);
+        res[0] = 1;
+        for(int i = 0;i<nums.size();i++){
+            // 1 bit
+            if(nums[i] != '0') { 
+                res[i+1] += res[i];
+            }
+            // 2 bits
+            if(i > 0 && nums[i-1] != '0' && (nums[i-1]-'0')*10+(nums[i]-'0') <= 26) {
+                res[i+1] += res[i-1];
+            }
+        }
+        return res[nums.size()];
+    }
+};
+```
+
+## 9. 礼物的最大价值
+
+> 动态规划（二维备忘录）
+
+```
+class Solution {
+public:
+    int maxValue(vector<vector<int> >& grid) 
+    {
+        int dp[205][205];
+        dp[1] = grid[0][0];
+        int n = grid.size();
+        int m = grid[0].size();
+        for(int i=0; i<n; i++)
+        {
+            for(int j=0; j<m; j++)
+            {
+                int x=i+1, y=j+1;
+                dp[x][y]=max(dp[x-1][y], dp[x][y-1]) + grid[i][j];
+            }
+        }
+        return dp[n][m];
+    }
+};
+```
+
+> 动态规划（二维备忘录，使用原数组）
+
+```
+class Solution {
+public:
+    int maxValue(vector<vector<int> >& grid) {
+        for(int i =1;i<grid[0].size();i++){
+            grid[0][i] += grid[0][i-1];
+        }
+        for(int i =1;i<grid.size();i++){
+            grid[i][0] +=grid[i-1][0];
+        }
+        for(int i =1;i<grid.size();i++){
+            for(int j =1;j<grid[0].size();j++){
+                grid[i][j] += max(grid[i-1][j],grid[i][j-1]);
+            }
+        }
+        return grid[grid.size()-1][grid[0].size()-1];
+    }
+};
+```
+
+> 动态规划（一维备忘录）
+
+```
+class Solution {
+public:
+    int maxValue(vector<vector<int> >& grid) {
+        if(grid.size() == 0) return 0;
+        vector<int> dp(grid[0].size()+1,0);
+        for(int i =0;i<grid.size();i++){
+            for(int j = 0;j<grid[0].size();j++){
+                dp[j+1] = max(dp[j+1]+grid[i][j],dp[j]+grid[i][j]);
+            }
+        }
+        return dp[grid[0].size()];
+    }
+};
+```
+
+## 10. 最长不含重复字符的子字符串
+
+```
+class Solution {
+public:
+    int lengthOfLongestSubstring(string s) {
+        unordered_map<char, int> m;
+        int start = 0;
+        int res = 0;
+        for(int i=0;i<s.size();i++){
+            if(m.find(s[i])!= m.end()){
+                start = max(start,m[s[i]]+1);
+            }
+             
+            res = max(res,i-start+1);
+            m[s[i]] = i;
+        }
+         
+        return res;
+    }
+};
+```
+
+## 11. 丑数
+
+```
+class Solution {
+public:
+    int GetUglyNumber_Solution(int index) {
+        if(index == 0) return 0;
+        set<long long> s; // 候选值
+        s.insert(1); // 初始值
+        while(s.size()){
+            auto v = *s.begin(); // 最小的
+            s.erase(s.begin());
+            if(!--index)return v; // 满足个数
+            s.insert(v*2); // 扩展*2
+            s.insert(v*3); // 扩展*3
+            s.insert(v*5); // 扩展*5
+        }
+        return -1;
+    }
+};
+```
+
+## 12. 第一个只出现一次的字符
+
+```
+class Solution {
+public:
+    int FirstNotRepeatingChar(string str) {
+        unordered_map<char, int> m;
+        for(char c : str) m[c]++;
+        for(int i = 0; i < str.size(); i++) {
+            if(m[str[i]] == 1) return i;
+        }
+        return -1;
+    }
+};
+```
+
+## 13. 数组中的逆序对
+
+```
+class Solution {
+public:
+    long long  merge(vector<int>& nums,int L,int M,int R ){
+        vector<int>help(R-L+1);
+        int sum = 0;
+        int i = 0;
+        int p1 = L;
+        int p2 = M+1;
+        while(p1<=M&&p2<=R){
+            sum += nums[p1]>nums[p2]?(M-p1+1):0;
+            help[i++] = nums[p1]<nums[p2]?nums[p1++]:nums[p2++];
+        }
+        while(p1<=M){
+            help[i++] = nums[p1++];
+        }
+        while(p2<=R){
+            help[i++] = nums[p2++];
+        }
+        for(int j=0;j<R-L+1;j++){
+            nums[L+j] = help[j];
+        }
+        return sum;
+    }
+    long long  mergesort(vector<int>& nums,int L,int R){
+        if(L == R) return 0;
+        int M = L+((R-L)>>1);
+        return mergesort(nums, L, M)+mergesort(nums, M+1, R)+merge(nums,L,M,R);
+        
+    }
+    int InversePairs(vector<int> data) {
+        int L = 0;
+        int R = data.size()-1;
+        return mergesort(data, L, R)%1000000007;
+    }
+};
+```
+
+## 14. 链表的第一个公共节点
+
+```
+/*
+struct ListNode {
+	int val;
+	struct ListNode *next;
+	ListNode(int x) :
+			val(x), next(NULL) {
+	}
+};*/
+class Solution {
+public:
+    ListNode* FindFirstCommonNode( ListNode* pHead1, ListNode* pHead2) {
+        if(pHead1 == nullptr || pHead2 == nullptr)
+        {
+            return nullptr;
+        }
+        
+        ListNode *p1 = pHead1;
+        ListNode *p2 = pHead2;
+        while(p1 != p2)
+        {
+            p1 = p1->next;
+            p2 = p2->next;
+            if(p1 != p2)
+            {
+                if(p1 == nullptr)
+                {
+                    p1 = pHead2;
+                }
+                if(p2 == nullptr)
+                {
+                    p2 = pHead1;
+                }
+            }
+        }
+        return p1;
+    }
+};
+```
