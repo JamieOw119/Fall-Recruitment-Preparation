@@ -1,4 +1,4 @@
-# 面试中的各项能力
+# 第六章 面试中的各项能力
 
 # 1. 在排序数组中查找数字
 
@@ -346,3 +346,518 @@ public:
     }
 };
 ```
+
+## 6. 翻转字符串
+
+```
+class Solution {
+public:
+    string reverseWords(string s) {
+        reverse(s.begin(), s.end());
+
+        int n = s.size();
+        int idx = 0;
+        for (int start = 0; start < n; ++start) {
+            if (s[start] != ' ') {
+                if (idx != 0) s[idx++] = ' ';
+
+                int end = start;
+                while (end < n && s[end] != ' ') s[idx++] = s[end++];
+
+                reverse(s.begin() + idx - (end - start), s.begin() + idx);
+
+                start = end;
+            }
+        }
+        s.erase(s.begin() + idx, s.end());
+        return s;
+    }
+};
+```
+ 
+> p.s.1 左旋转字符串
+
+```
+class Solution 
+{
+public:
+    string LeftRotateString(string str, int n) {
+        if(!str.length())
+            return str;
+        if(n>str.length())
+            n = n % str.length();
+        string res=str.substr(n)+str.substr(0,n);   
+    }
+};
+```
+
+## 7. 滑动窗口的最大值
+
+```
+class Solution {
+public:
+    string reverseWords(string s) {
+        reverse(s.begin(), s.end());
+        int n = s.size();
+        int idx = 0;
+        for(int start = 0; start < n; start ++)
+        {
+            if(s[start] != ' ')
+            {
+                if(idx != 0)
+                {
+                    s[idx ++] = ' ';
+                }
+                int end = start;
+                while(end < n && s[end] != ' ')
+                {
+                    s[idx ++] = s[end ++];
+                }
+                reverse(s.begin() + idx - (end - start), s.begin() + idx);
+                start = end;
+            }
+        }
+        s.erase(s.begin() + idx, s.end());
+        return s;
+    }
+};
+```
+
+## 8. 滑动窗口的最大值
+
+```
+class Solution {
+public:
+    vector<int> maxInWindows(const vector<int>& nums, int size) {
+        vector<int> v;
+        deque<int> dq;
+        if(size > nums.size() || !size)
+        {
+            return v;
+        }
+        for(int i = 0; i < nums.size(); i++)
+        {
+            while(!dq.empty() && nums[dq.back()] < nums[i])
+            {
+                dq.pop_back();
+            }
+            dq.push_back(i);
+            if(dq.front() + size <= i)
+            {
+                dq.pop_front();
+            }
+            if(i + 1 >= size)
+            {
+                v.push_back(nums[dq.front()]);
+            }
+        }
+        return v;
+    }
+};
+```
+
+> 队列的最大值
+
+```
+class MaxQueue {
+    queue<int> q;
+    deque<int> d;
+public:
+    MaxQueue() {}
+    
+    int max_value() 
+    {
+        if (d.empty())
+            return -1;
+        return d.front();
+    }
+    
+    void push_back(int value) 
+    {
+        while (!d.empty() && d.back() < value) 
+        {
+            d.pop_back();
+        }
+        d.push_back(value);
+        q.push(value);
+    }
+    
+    int pop_front() 
+    {
+        if (q.empty())
+            return -1;
+        int ans = q.front();
+        if (ans == d.front()) 
+        {
+            d.pop_front();
+        }
+        q.pop();
+        return ans;
+    }
+};
+```
+
+## 9. n个骰子的点数
+
+```
+class Solution {
+public:
+    vector<double> dicesProbability(int n) 
+    {
+        vector<double> dp(6, 1.0 / 6.0);
+        for (int i = 2; i <= n; i++) 
+        {
+            vector<double> tmp(5 * i + 1, 0);
+            for (int j = 0; j < dp.size(); j++) 
+            {
+                for (int k = 0; k < 6; k++) 
+                {
+                    tmp[j + k] += dp[j] / 6.0;
+                }
+            }
+            dp = tmp;
+        }
+        return dp;
+    }
+};
+```
+
+> p.s.1 扑克牌中的顺子
+
+```
+class Solution {
+public:
+    bool IsContinuous( vector<int> numbers ) 
+    {
+        int flag = 0;
+        int _min = 14, _max = 0;
+        for(auto i: numbers)
+        {
+            if(i == 0)
+            {
+                continue;
+            }
+            _min = min(_min, i);
+            _max = max(_max, i);
+            if((flag&(1<<i)) !=0 )
+            {
+                return false;
+            }
+            flag |= (1 << i);
+        }
+        return _max - _min < 5;
+    }
+};
+```
+
+## 10. 孩子们的游戏
+
+> 约瑟夫环
+
+```
+class Solution {
+public:
+    int LastRemaining_Solution(int n, int m) 
+    {
+        if(n < 1 || m < 1)
+        {
+            return -1;
+        }
+        int last = 0;
+        for(int i=2; i<=n; i++)
+        {
+            last = (last + m) % i;
+        }
+        return last;
+    }
+};
+```
+
+## 11. 买卖股票的最好时机
+
+```
+class Solution {
+public:
+    int maxProfit(vector<int>& prices) 
+    {
+        if(prices.size()<2)
+        {
+            return 0;
+        }
+        int min = prices[0];
+        
+        if(prices.size()>2)
+        {
+            int maxDiff = 0;
+            for(int i=2; i < prices.size(); i++)
+            {
+                if(prices[i-1]<min)
+                {
+                    min = prices[i-1];
+                }
+                int currentDiff = prices[i] - min;
+                if(currentDiff > maxDiff)
+                {
+                    maxDiff = currentDiff;
+                }
+            }
+            return maxDiff;
+        }
+        else
+        {
+            return prices[1] > prices[0] ? prices[1] - prices[0] : 0;
+        }
+    }
+};
+```
+
+## 12. 求 1 + 2 + ... + n
+
+> 递归
+
+```
+class Solution {
+public:
+    int res = 0;
+    int Sum_Solution(int n) {
+        // n = 0 时停止递归
+        n && (n += Sum_Solution(n-1));
+        return n;
+    }
+};
+```
+
+> 一半内存的大小
+
+```
+class Solution {
+public:
+    int res = 0;
+    int Sum_Solution(int n) {
+        bool buffer[n][n + 1];
+        return sizeof(buffer) >> 1;
+    }
+};
+```
+
+> 快速乘法
+
+```
+class Solution {
+public:
+    int res = 0;
+    int Sum_Solution(int n) {
+        int res = 0;
+        int A = n, B = n + 1;
+        //14次快速乘法
+        (B & 1) && (res += A);
+        A <<= 1;
+        B >>= 1;
+        (B & 1) && (res += A);
+        A <<= 1;
+        B >>= 1;
+        (B & 1) && (res += A);
+        A <<= 1;
+        B >>= 1;
+        (B & 1) && (res += A);
+        A <<= 1;
+        B >>= 1;
+        (B & 1) && (res += A);
+        A <<= 1;
+        B >>= 1;
+        (B & 1) && (res += A);
+        A <<= 1;
+        B >>= 1;
+        (B & 1) && (res += A);
+        A <<= 1;
+        B >>= 1;
+        (B & 1) && (res += A);
+        A <<= 1;
+        B >>= 1;
+        return res >> 1; //除2
+    }
+};
+```
+
+> 构造函数
+
+```
+class Temp
+{
+public:
+    Temp(){++ N; sum += N;}
+    static void Reset(){N = 0; Sum = 0;}
+    static unsigned GetSum() {return Sum;}
+
+private:
+    static unsigned int N;
+    static unsigned int Sum;
+}
+
+unsigned int Temp::N = 0;
+unsigned int Temp::Sum = 0;
+
+unsigned int Sum_Solution(unsigned int n)
+{
+    Temp::Reset();
+    Temp *a = new Temp[n];
+    delete []a;
+    a = nullptr;
+    return Temp::GetSum();
+}
+```
+
+> 虚函数
+
+```
+class A;
+A *array[2];
+
+class A
+{
+public:
+    virtual unsigned int Sum(unsigned int n)
+    {
+        return 0;
+    }
+};
+    
+class B: publicA
+{
+public:
+    virtual unsigned int Sum(unsigned n)
+    {
+        return Array[!!n]->Sum(n-1)+n;
+    }
+};
+
+int Sum_Solution(int n)
+{
+    A a;
+    B b;
+    Array[0] = &a;
+    Array[1] = &b;
+    int value = Array[1]->Sum(n);
+    return value;
+}
+```
+
+> 函数指针
+
+```
+typedef unsigned int (*fun)(unsigned int);
+
+unsigned int Solution_Terminator(unsigned int n)
+{
+    return 0;
+}
+
+unsigned int Sum_Solution(unsigned int n)
+{
+    static fun f[2] = {Solution_Terminator, Sum_Solution};
+    return n + f[!!n](n + 1);
+}
+```
+
+> 模板类型
+
+```
+template<unsigned int n> struct Sum_Solution
+{
+    enum Value {N = Sum_solution<n-1>::N+n};
+}
+
+template<> struct Sum_Solution<>
+{
+    enum Value {N = 1};
+}
+```
+
+## 13. 不用加减乘除做加法
+
+> 自增
+
+```
+class Solution {
+public:
+    int Add(int num1, int num2) 
+    {
+        if(num1>0)
+        {
+            while(num1--)
+            {
+                num2 ++;
+            }
+        }
+        else if(num1 < 0)
+        {
+            while(num1 ++)
+            {
+                num2 --;
+            }
+        }
+        return num2;
+    }
+};
+```
+
+> 位运算
+
+```
+class Solution {
+public:
+    int Add(int num1, int num2) 
+    {
+        while(num2)
+        {
+            int sum = num1 ^ num2; // 当前位的和
+            int tmp = (unsigned int)(num1 & num2) << 1; // 进位
+            num1 = sum;
+            num2 = tmp;
+        }
+        return num1;
+    }
+};
+```
+
+```
+class Solution {
+public:
+    int Add(int num1, int num2) 
+    {
+        
+        if(num2 == 0)
+        {
+            return num1;
+        } 
+        return Add(num2 ^ num1, (unsigned int)(num1 & num2) << 1);
+    }
+};
+```
+
+## 14. 构建乘积数组
+
+```
+class Solution {
+public:
+    vector<int> multiply(const vector<int>& A) {
+        int len = A.size();
+        vector<int> B;
+        int mul = 1;
+        for(int i=0; i<len; i++) 
+        {
+            for(int j=0; j<len; j++) 
+            {
+                if(i!=j)
+                {
+                    mul *= A[j];
+                }
+            }
+            B.push_back(mul);
+            mul = 1;
+        }
+        return B;
+    }
+};
+```
+
