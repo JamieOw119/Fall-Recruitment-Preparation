@@ -67,24 +67,21 @@ public:
 ```
 class Solution {
 public:
-    int numDistinct(string s, string t) 
-    {
-        if (s.size() < t.size()) 
-        {
+    int numDistinct(string s, string t) {
+        if (s.size() < t.size()) {
             return 0;
         }
 
         int n = t.size();
-        vector<unsigned int> dp(n+1, 0)
+        vector<unsigned int>dp(n + 1, 0);
         dp[0] = 1;
 
-        for (int i = 0; i < s.size(); ++i) 
-        {
+        for (int i = 0; i < s.size(); ++i) {
             int temp1 = 1;
             int temp2 = 1;
             for (int j = 0; j <= i && j < n; ++j) {
-                temp2 = dp[j+1];
-                dp[j+1] += (s[i] == t[j]) ? temp1: 0;
+                temp2 = dp[j + 1];
+                dp[j + 1] += (s[i] == t[j]) ? temp1 : 0;
                 temp1 = temp2;
             }
         }
