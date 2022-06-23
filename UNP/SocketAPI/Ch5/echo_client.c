@@ -21,7 +21,12 @@ main(int argc, char **argv)
 		Connect(sockfd[i], (SA *) &servaddr, sizeof(servaddr));
 	}
 
-	str_cli(stdin, sockfd[0]);		/* do it all */
+	// p.s. 
+	// str_echo/str_echo2 - str_cli
+	// str_echo3 - str_cli2
+
+	// str_cli(stdin, sockfd[0]);
+	str_cli2(stdin, sockfd[0]);
 
 	exit(0);
 }

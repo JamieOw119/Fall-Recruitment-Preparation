@@ -33,7 +33,15 @@ main(int argc, char **argv)
 
 		if ( (childpid = Fork()) == 0) {	/* child process */
 			Close(listenfd);	/* close listening socket */
-			str_echo(connfd);	/* process the request */
+
+			// p.s. 
+			// str_echo/str_echo2 - str_cli
+			// str_echo3 - str_cli2
+
+			// str_echo(connfd);	/* process the request */
+			// str_echo2(connfd);
+			str_echo3(connfd);
+			
 			exit(0);
 		}
 		Close(connfd);			/* parent closes connected socket */
